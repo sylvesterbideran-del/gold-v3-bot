@@ -53,7 +53,7 @@ bot_status = {
     "stop_tav": None,
     "aktiv_trade": "nincs aktív trade",
     "aktiv_trade_reszletek": None,
-    "frissitve": budapest_str('%Y-%m-%d %H:%M:%S')
+    "frissitve": budapest_str(("%Y-%m-%d %H:%M:%S")
 }
 
 utolso_jel_tipus = None
@@ -73,7 +73,7 @@ def home():
 
 @app.route("/status")
 def status():
-    bot_status["frissitve"] = budapest_str('%Y-%m-%d %H:%M:%S')
+    bot_status["frissitve"] = budapest_str(("%Y-%m-%d %H:%M:%S")
     resp = jsonify(bot_status)
     resp.headers.add('Access-Control-Allow-Origin', '*')
     return resp
@@ -194,7 +194,7 @@ def analyze():
     df["rsi"] = calc_rsi(df["close"], RSI_PERIOD)
     df["atr"] = calc_atr(df, ATR_PERIOD)
     last = df.iloc[-1]
-    bot_status["utolso_ellenorzes"] = budapest_str('%Y-%m-%d %H:%M:%S')
+    bot_status["utolso_ellenorzes"] = budapest_str(("%Y-%m-%d %H:%M:%S")
     bot_status["aktualis_ar"] = float(last["close"])
     bot_status["rsi"] = round(float(last["rsi"]), 2) if pd.notna(last["rsi"]) else None
     bot_status["atr"] = round(float(last["atr"]), 2) if pd.notna(last["atr"]) else None
@@ -257,17 +257,17 @@ def check_aktiv_trade(res):
     if tipus == "LONG":
         if current_low <= stop:
             hit = "STOP"
-            uzenet = f"🔴 STOP TALÁLAT - {tipus}\n💰 Belépő: {belepo:.2f}\n🛑 Stop: {stop:.2f} eltalálva! Ár: {current_price:.2f}\n📉 Veszteség: {toke_pct:.1f}% tőke\n⏰ {budapest_str('%H:%M:%S')}\n⚠️ Zárd a pozíciót!"
+            uzenet = f"🔴 STOP TALÁLAT - {tipus}\n💰 Belépő: {belepo:.2f}\n🛑 Stop: {stop:.2f} eltalálva! Ár: {current_price:.2f}\n📉 Veszteség: {toke_pct:.1f}% tőke\n⏰ {budapest_str(('%H:%M:%S')}\n⚠️ Zárd a pozíciót!"
         elif current_high >= tp:
             hit = "TP"
-            uzenet = f"🟢 TP TALÁLAT - {tipus} 🎯\n💰 Belépő: {belepo:.2f}\n🎯 TP: {tp:.2f} eltalálva! Ár: {current_price:.2f}\n📈 Nyereség: +{toke_pct*2:.1f}% tőke (RR 1:2)\n⏰ {budapest_str('%H:%M:%S')}\n✅ Gratulálok! Sly büszke!"
+            uzenet = f"🟢 TP TALÁLAT - {tipus} 🎯\n💰 Belépő: {belepo:.2f}\n🎯 TP: {tp:.2f} eltalálva! Ár: {current_price:.2f}\n📈 Nyereség: +{toke_pct*2:.1f}% tőke (RR 1:2)\n⏰ {budapest_str(('%H:%M:%S')}\n✅ Gratulálok! Sly büszke!"
     else:
         if current_high >= stop:
             hit = "STOP"
-            uzenet = f"🔴 STOP TALÁLAT - {tipus}\n💰 Belépő: {belepo:.2f}\n🛑 Stop: {stop:.2f} eltalálva! Ár: {current_price:.2f}\n📉 Veszteség: {toke_pct:.1f}% tőke\n⏰ {budapest_str('%H:%M:%S')}"
+            uzenet = f"🔴 STOP TALÁLAT - {tipus}\n💰 Belépő: {belepo:.2f}\n🛑 Stop: {stop:.2f} eltalálva! Ár: {current_price:.2f}\n📉 Veszteség: {toke_pct:.1f}% tőke\n⏰ {budapest_str(('%H:%M:%S')}"
         elif current_low <= tp:
             hit = "TP"
-            uzenet = f"🟢 TP TALÁLAT - {tipus} 🎯\n💰 Belépő: {belepo:.2f}\n🎯 TP: {tp:.2f} eltalálva! Ár: {current_price:.2f}\n📈 Nyereség: +{toke_pct*2:.1f}% tőke (RR 1:2)\n⏰ {budapest_str('%H:%M:%S')}"
+            uzenet = f"🟢 TP TALÁLAT - {tipus} 🎯\n💰 Belépő: {belepo:.2f}\n🎯 TP: {tp:.2f} eltalálva! Ár: {current_price:.2f}\n📈 Nyereség: +{toke_pct*2:.1f}% tőke (RR 1:2)\n⏰ {budapest_str(('%H:%M:%S')}"
     if hit:
         send_telegram(uzenet)
         print(f"[{hit} TALÁLAT] {tipus} {belepo:.2f} -> {current_price:.2f}")
@@ -298,7 +298,7 @@ def main_loop():
                     print(f"[SKIP] {res['jel']} már volt")
                 else:
                     bot_status["mai_jelek"] += 1
-                    bot_status["utolso_jel"] = f"{res['jel']} {res['ar']:.2f} ATR:{res['atr']:.2f} - {budapest_str('%H:%M:%S')}"
+                    bot_status["utolso_jel"] = f"{res['jel']} {res['ar']:.2f} ATR:{res['atr']:.2f} - {budapest_str(('%H:%M:%S')}"
                     utolso_jel_tipus = res["jel"]
                     utolso_jel_ido = most
                     stop_ar = res["ar"] + res["stop_dist"] if res["jel"]=="SHORT" else res["ar"] - res["stop_dist"]
@@ -311,7 +311,7 @@ def main_loop():
                         "tp": tp_ar,
                         "atr": res["atr_used"],
                         "toke_pct": toke_pct,
-                        "ido": budapest_str('%Y-%m-%d %H:%M:%S')
+                        "ido": budapest_str(("%Y-%m-%d %H:%M:%S")
                     }
                     bot_status["aktiv_trade"] = f"AKTÍV {res['jel']} {res['ar']:.2f} Stop:{stop_ar:.2f} TP:{tp_ar:.2f} ({toke_pct:.1f}% -> +{toke_pct*2:.1f}%)"
                     bot_status["aktiv_trade_reszletek"] = aktiv_trade
